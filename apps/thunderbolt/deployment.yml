@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: thunderbolt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: thunderbolt
+  template:
+    metadata:
+      labels:
+        app: thunderbolt
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/the-most-secure-supply-chain-ever-maaan/thunderbolt@sha256-8d0ac4ea1fa78c752689c3ae51ce4a48d4c4de5c322ffacc00f74db662963414
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: thunderbolt
+spec:
+  selector:
+    app: thunderbolt
+  ports:
+    - port: 80
+      targetPort: 80
