@@ -16,7 +16,7 @@ spec:
         - name: web
           image: ghcr.io/the-most-secure-supply-chain-ever-maaan/thunderbolt:main
           ports:
-            - containerPort: 80
+            - containerPort: 5731
 ---
 apiVersion: v1
 kind: Service
