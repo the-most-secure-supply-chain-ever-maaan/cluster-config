@@ -27,4 +27,4 @@ spec:
     app: thunderbolt
   ports:
     - port: 80
-      targetPort: 80
+      targetPort: 5731 # nginx port
