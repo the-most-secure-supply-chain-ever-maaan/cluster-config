@@ -4,7 +4,7 @@ metadata:
   name: verify-slsa-provenance
 spec:
   validationFailureAction: Enforce
-  failurePolicy: Fail # webhook nede → reject (som du valgte)
+  failurePolicy: Fail
   background: false
   webhookTimeoutSeconds: 30
   rules:
@@ -17,6 +17,7 @@ spec:
       verifyImages:
         - imageReferences:
             - "ghcr.io/the-most-secure-supply-chain-ever-maaan/*"
+          type: SigstoreBundle # ← dette manglet
           attestations:
             - type: https://slsa.dev/provenance/v1
               attestors:
