@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: thunderbolt
 spec:
-  replicas: 5
+  replicas: 1
   selector:
     matchLabels:
       app: thunderbolt
@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: web
-          image: ghcr.io/the-most-secure-supply-chain-ever-maaan/thunderbolt:main
+          image: ghcr.io/the-most-secure-supply-chain-ever-maaan/thunderbolt@sha256:a16bc917db43a696ed55e2786df0e6a034f02ab1ed2e4525d314336a6622dba1
           ports:
             - containerPort: 5731
 ---
@@ -28,3 +28,4 @@ spec:
   ports:
     - port: 80
       targetPort: 5731 # nginx port
+---
