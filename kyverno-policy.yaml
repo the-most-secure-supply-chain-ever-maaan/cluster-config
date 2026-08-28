@@ -1,0 +1,28 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-slsa-provenance
+spec:
+  validationFailureAction: Enforce
+  failurePolicy: Fail # webhook nede → reject (som du valgte)
+  background: false
+  webhookTimeoutSeconds: 30
+  rules:
+    - name: verify-github-slsa-attestation
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      verifyImages:
+        - imageReferences:
+            - "ghcr.io/the-most-secure-supply-chain-ever-maaan/*"
+          attestations:
+            - type: https://slsa.dev/provenance/v1
+              attestors:
+                - entries:
+                    - keyless:
+                        issuer: "https://token.actions.githubusercontent.com"
+                        subject: "https://github.com/the-most-secure-supply-chain-ever-maaan/workflows/.github/workflows/build.yaml@refs/heads/main"
+                        rekor:
+                          url: https://rekor.sigstore.dev
