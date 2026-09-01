@@ -1,3 +1,5 @@
+# cluster-config/argocd/application.yaml
+# Bootstrappes manuelt. Se argocd/README.md for rekkefølge.
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -7,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/the-most-secure-supply-chain-ever-maaan/cluster-config
-    targetRevision: HEAD
+    targetRevision: main
     path: apps/thunderbolt
   destination:
     server: https://kubernetes.default.svc
