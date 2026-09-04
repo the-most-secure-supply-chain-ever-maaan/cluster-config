@@ -1,0 +1,5 @@
+policy:
+  enabled: true
+  subjectRegExp: '^https://github\\.com/the-most-secure-supply-chain-ever-maaan/workflows/\\.github/workflows/build\\.yaml@refs/heads/main$'
+  images:
+    - "ghcr.io/the-most-secure-supply-chain-ever-maaan/**"
