@@ -1,6 +1,7 @@
 policy:
   enabled: true
-  subjectRegExp: '^https://github\\.com/the-most-secure-supply-chain-ever-maaan/workflows/\\.github/workflows/build\\.yaml@.*$'
+  # build.yaml v1.3.0
+  subjectRegExp: '^https://github[.]com/the-most-secure-supply-chain-ever-maaan/workflows/[.]github/workflows/build[.]yaml@5376975a88f7ffa540d7fb59dba13e7ef881c7fc$'
   images:
     - "ghcr.io/the-most-secure-supply-chain-ever-maaan/**"
   predicateType: https://slsa.dev/provenance/v1
