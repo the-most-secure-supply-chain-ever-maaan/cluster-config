@@ -1,6 +1,5 @@
 name: Bump image digest
 
-
 on:
   workflow_dispatch:
     inputs:
@@ -111,6 +110,9 @@ jobs:
           BRANCH="bump-${APP}-${DIGEST:7:12}"
           git checkout -b "$BRANCH"
           git commit -am "Bump ${APP} to ${DIGEST}"
+
+          git fetch origin "+refs/heads/${BRANCH}:refs/remotes/origin/${BRANCH}" || true
+
           git push --force-with-lease origin "$BRANCH"
 
           if ! gh pr view "$BRANCH" --json number >/dev/null 2>&1; then
