@@ -1,9 +1,6 @@
 name: Bump image digest
 
-# Trigges av byggepipelinen i et app-repo, men stoler ikke på den.
-# Alle inputs er utrusted: appen som kaller har kun Actions: write her,
-# og kan derfor be om en bump, men ikke bestemme utfallet. Denne
-# workflowen verifiserer provenance selv før den rører et manifest.
+
 on:
   workflow_dispatch:
     inputs:
