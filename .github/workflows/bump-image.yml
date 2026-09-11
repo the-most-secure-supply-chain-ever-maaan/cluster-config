@@ -1,0 +1,121 @@
+name: Bump image digest
+
+
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: App name. Must match apps/<app>/deployment.yml.
+        type: string
+        required: true
+      digest:
+        description: Image digest to deploy, sha256:<64 hex>.
+        type: string
+        required: true
+      source-digest:
+        description: Commit SHA the image was built from.
+        type: string
+        required: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  packages: read
+
+concurrency:
+  group: bump-${{ inputs.app }}
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  SIGNER_WORKFLOW: the-most-secure-supply-chain-ever-maaan/workflows/.github/workflows/build.yaml
+
+jobs:
+  bump:
+    name: Verify provenance and bump
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Validate inputs
+        env:
+          APP: ${{ inputs.app }}
+          DIGEST: ${{ inputs.digest }}
+          SOURCE_DIGEST: ${{ inputs.source-digest }}
+        run: |
+          set -euo pipefail
+
+          # Strenge format-sjekker. APP går inn i en filsti, så den må ikke
+          # kunne inneholde ../ eller andre overraskelser.
+          [[ "$APP" =~ ^[a-z0-9][a-z0-9-]{0,62}$ ]] \
+            || { echo "::error::Invalid app name: $APP"; exit 1; }
+          [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]] \
+            || { echo "::error::Invalid digest: $DIGEST"; exit 1; }
+          [[ "$SOURCE_DIGEST" =~ ^[0-9a-f]{40}$ ]] \
+            || { echo "::error::Invalid source digest: $SOURCE_DIGEST"; exit 1; }
+
+          [[ -f "apps/${APP}/deployment.yml" ]] \
+            || { echo "::error::No manifest at apps/${APP}/deployment.yml"; exit 1; }
+
+      - name: Authenticate to registry
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify provenance is from the trusted builder and from this commit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          APP: ${{ inputs.app }}
+          DIGEST: ${{ inputs.digest }}
+          SOURCE_DIGEST: ${{ inputs.source-digest }}
+        run: |
+          set -euo pipefail
+
+          IMAGE="${REGISTRY}/${OWNER}/${APP}"
+
+          gh attestation verify "oci://${IMAGE}@${DIGEST}" \
+            --owner "$OWNER" \
+            --signer-workflow "$SIGNER_WORKFLOW" \
+            --predicate-type https://slsa.dev/provenance/v1 \
+            --source-digest "$SOURCE_DIGEST"
+
+          echo "Verified ${IMAGE}@${DIGEST} built by ${SIGNER_WORKFLOW} from ${SOURCE_DIGEST}"
+
+      - name: Bump image digest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          APP: ${{ inputs.app }}
+          DIGEST: ${{ inputs.digest }}
+          SOURCE_DIGEST: ${{ inputs.source-digest }}
+        run: |
+          set -euo pipefail
+
+          IMAGE="${REGISTRY}/${OWNER}/${APP}"
+          DEPLOYMENT_FILE="apps/${APP}/deployment.yml"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          sed -i -E "s|(image: ${IMAGE}@)sha256:[a-f0-9]+|\1${DIGEST}|" "$DEPLOYMENT_FILE"
+
+          if git diff --quiet -- "$DEPLOYMENT_FILE"; then
+            echo "$DEPLOYMENT_FILE is already at ${DIGEST}, nothing to bump"
+            exit 0
+          fi
+
+          BRANCH="bump-${APP}-${DIGEST:7:12}"
+          git checkout -b "$BRANCH"
+          git commit -am "Bump ${APP} to ${DIGEST}"
+          git push --force-with-lease origin "$BRANCH"
+
+          if ! gh pr view "$BRANCH" --json number >/dev/null 2>&1; then
+            gh pr create --base main --head "$BRANCH" \
+              --title "Bump ${APP} to ${DIGEST}" \
+              --body "Provenance verified in this repo: built by ${SIGNER_WORKFLOW} from ${OWNER}/${APP}@${SOURCE_DIGEST}."
+          fi
+          gh pr merge "$BRANCH" --auto --squash --delete-branch
