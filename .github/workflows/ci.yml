@@ -45,7 +45,7 @@ jobs:
                       APP=$(basename "$(dirname "$FILE")")
                       DIGEST=$(grep -oE 'sha256:[a-f0-9]{64}' "$FILE")
                       gh attestation verify "oci://${REGISTRY}/${OWNER}/${APP}@${DIGEST}" \
-                      --owner "$OWNER" \
+                      --repo "${OWNER}/${APP}" \
                       --signer-workflow "$SIGNER_WORKFLOW"
                       echo "OK: ${APP}@${DIGEST}"
                   done
