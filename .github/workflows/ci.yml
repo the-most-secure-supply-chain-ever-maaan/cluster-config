@@ -19,7 +19,7 @@ env:
     SIGNER_WORKFLOW: the-most-secure-supply-chain-ever-maaan/workflows/.github/workflows/build.yaml
 
 jobs:
-    bump:
+    verify:
         name: Verify provenance
         runs-on: ubuntu-latest
         steps:
