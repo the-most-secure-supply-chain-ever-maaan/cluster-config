@@ -1,0 +1,46 @@
+name: CI for cluster-config
+description: "Simple workflow verifying that the image is actually from the expected owner, and workflow. "
+
+on:
+    pull_request:
+        branches:
+            - main
+
+permissions:
+    contents: read
+    packages: read
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+env:
+    REGISTRY: ghcr.io
+    SIGNER_WORKFLOW: the-most-secure-supply-chain-ever-maaan/workflows/.github/workflows/build.yaml
+
+jobs:
+    bump:
+        name: Verify provenance
+        runs-on: ubuntu-latest
+        steps:
+            - name: Authenticate to registry
+              uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+              with:
+                  registry: ${{ env.REGISTRY }}
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Verify provenance is from the trusted builder and from this commit
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  OWNER: ${{ github.repository_owner }}
+              run: |
+                  set -euo pipefail
+                  for FILE in apps/*/deployment.yml; do
+                      APP=$(basename "$(dirname "$FILE")")
+                      DIGEST=$(grep -oE 'sha256:[a-f0-9]{64}' "$FILE")
+                      gh attestation verify "oci://${REGISTRY}/${OWNER}/${APP}@${DIGEST}" \
+                      --owner "$OWNER" \
+                      --signer-workflow "$SIGNER_WORKFLOW"
+                      echo "OK: ${APP}@${DIGEST}"
+                  done
