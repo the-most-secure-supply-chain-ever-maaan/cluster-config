@@ -33,7 +33,7 @@ jobs:
                   username: ${{ github.actor }}
                   password: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: Verify provenance is from the trusted builder and from this commit
+            - name: Verify provenance is from the trusted builder
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   OWNER: ${{ github.repository_owner }}
