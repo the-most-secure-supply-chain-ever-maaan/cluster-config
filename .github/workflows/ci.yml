@@ -1,5 +1,5 @@
 name: CI for cluster-config
-description: "Simple workflow verifying that the image is actually from the expected owner, and workflow. "
+description: "Simple workflow verifying that the images are actually from the expected owner, and workflow. "
 
 on:
     pull_request:
