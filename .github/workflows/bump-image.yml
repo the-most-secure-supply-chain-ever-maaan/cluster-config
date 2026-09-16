@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       app:
-        description: App name. Must match apps/<app>/deployment.yml.
+        description: App name. Must match apps/<app>/deployment.yml and source repo
         type: string
         required: true
       digest:
@@ -79,7 +79,7 @@ jobs:
           IMAGE="${REGISTRY}/${OWNER}/${APP}"
 
           gh attestation verify "oci://${IMAGE}@${DIGEST}" \
-            --owner "$OWNER" \
+            --repo "${OWNER}/${APP}" \
             --signer-workflow "$SIGNER_WORKFLOW" \
             --predicate-type https://slsa.dev/provenance/v1 \
             --source-digest "$SOURCE_DIGEST"
