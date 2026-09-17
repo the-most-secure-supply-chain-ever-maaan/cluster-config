@@ -82,6 +82,7 @@ jobs:
             --repo "${OWNER}/${APP}" \
             --signer-workflow "$SIGNER_WORKFLOW" \
             --predicate-type https://slsa.dev/provenance/v1 \
+            --source-ref refs/heads/main \
             --source-digest "$SOURCE_DIGEST"
 
           echo "Verified ${IMAGE}@${DIGEST} built by ${SIGNER_WORKFLOW} from ${SOURCE_DIGEST}"
