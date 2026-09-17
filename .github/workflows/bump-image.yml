@@ -115,7 +115,9 @@ jobs:
 
           git fetch origin "+refs/heads/${BRANCH}:refs/remotes/origin/${BRANCH}" || true
 
-          git push --force-with-lease origin "$BRANCH"
+          git push --force-with-lease \
+            "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
+            "$BRANCH"
 
           if ! gh pr view "$BRANCH" --json number >/dev/null 2>&1; then
             gh pr create --base main --head "$BRANCH" \
