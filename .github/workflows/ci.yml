@@ -46,7 +46,7 @@ jobs:
                       DIGEST=$(grep -oE 'sha256:[a-f0-9]{64}' "$FILE")
                       gh attestation verify "oci://${REGISTRY}/${OWNER}/${APP}@${DIGEST}" \
                       --repo "${OWNER}/${APP}" \
-                      --signer-workflow "$SIGNER_WORKFLOW"
+                      --signer-workflow "$SIGNER_WORKFLOW" \
                       --predicate-type https://slsa.dev/provenance/v1 \
                       --source-ref refs/heads/main
                       echo "OK: ${APP}@${DIGEST}"
