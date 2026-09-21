@@ -3,5 +3,5 @@ policy:
   # build.yaml v1.5.0
   subjectRegExp: '^https://github\\.com/the-most-secure-supply-chain-ever-maaan/workflows/\\.github/workflows/build\\.yaml@.*$'
   images:
-    - "ghcr.io/the-most-secure-supply-chain-ever-maaan/**"
+    - "ghcr.io/the-most-secure-supply-chain-ever-maaan/thunderbolt"
   predicateType: https://slsa.dev/provenance/v1
