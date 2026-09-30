@@ -84,6 +84,7 @@ jobs:
             --predicate-type https://slsa.dev/provenance/v1 \
             --source-ref refs/heads/main \
             --source-digest "$SOURCE_DIGEST"
+            --deny-self-hosted-runners
 
           echo "Verified ${IMAGE}@${DIGEST} built by ${SIGNER_WORKFLOW} from ${SOURCE_DIGEST}"
 
