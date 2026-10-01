@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: web
-          image: ghcr.io/the-most-secure-supply-chain-ever-maaan/thunderbolt@sha256:6ac3a7c12f73c9ef2e9de4e02e6584d0a13b06adee56d05a9717e811b447b4db
+          image: ghcr.io/the-most-secure-supply-chain-ever-maaan/thunderbolt@sha256:cbee8da0679ab9266750c8f31ab958709278c51b700e7bf42b78718d00d28aec
           ports:
             - containerPort: 5731
 ---
